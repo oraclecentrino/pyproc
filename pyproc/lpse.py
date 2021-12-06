@@ -286,7 +286,6 @@ class Lpse(object):
         :param data_only: hanya menampilkan data tanpa menampilkan informasi lain
         :param kategori: kategori pengadaan (lihat di pypro.kategori)
         :param search_keyword: keyword pencarian paket pengadaan
-        :param nama_penyedia: filter berdasarkan nama penyedia
         :param order: Mengurutkan data berdasarkan kolom
         :param tahun: Tahun pengadaan
         :param ascending: Ascending, descending jika diset False
@@ -295,6 +294,57 @@ class Lpse(object):
         """
         return self.get_paket('pl', start, length, data_only, kategori, search_keyword, None, order, tahun,
                               ascending, instansi_id)
+
+    def get_pencatatan_non_tender(self, start=0, length=0, data_only=False, kategori=None, search_keyword=None,
+                                  order=By.KODE, tahun=None, ascending=False):
+        """
+        Wrapper pencarian data pencatatan non tender
+        :param start: index data awal
+        :param length: jumlah data yang ditampilkan
+        :param data_only: hanya menampilkan data tanpa menampilkan informasi lain
+        :param kategori: kategori pengadaan (lihat di pypro.kategori)
+        :param search_keyword: keyword pencarian paket pengadaan
+        :param order: Mengurutkan data berdasarkan kolom
+        :param tahun: Tahun pengadaan
+        :param ascending: Ascending, descending jika diset False
+        :return: dictionary dari hasil pencarian paket (atau list jika data_only=True)
+        """
+        return self.get_paket('nonspk', start, length, data_only, kategori, search_keyword, None, order, tahun,
+                              ascending, None)
+
+    def get_pencatatan_swakelola(self, start=0, length=0, data_only=False, kategori=None, search_keyword=None,
+                                 order=By.KODE, tahun=None, ascending=False):
+        """
+        Wrapper pencarian data pencatatan swakelola
+        :param start: index data awal
+        :param length: jumlah data yang ditampilkan
+        :param data_only: hanya menampilkan data tanpa menampilkan informasi lain
+        :param kategori: kategori pengadaan (lihat di pypro.kategori)
+        :param search_keyword: keyword pencarian paket pengadaan
+        :param order: Mengurutkan data berdasarkan kolom
+        :param tahun: Tahun pengadaan
+        :param ascending: Ascending, descending jika diset False
+        :return: dictionary dari hasil pencarian paket (atau list jika data_only=True)
+        """
+        return self.get_paket('swakelola', start, length, data_only, kategori, search_keyword, None, order, tahun,
+                              ascending, None)
+
+    def get_pencatatan_pengadaan_darurat(self, start=0, length=0, data_only=False, kategori=None, search_keyword=None,
+                                         order=By.KODE, tahun=None, ascending=False):
+        """
+        Wrapper pencarian data pencatatan pengadaan darurat
+        :param start: index data awal
+        :param length: jumlah data yang ditampilkan
+        :param data_only: hanya menampilkan data tanpa menampilkan informasi lain
+        :param kategori: kategori pengadaan (lihat di pypro.kategori)
+        :param search_keyword: keyword pencarian paket pengadaan
+        :param order: Mengurutkan data berdasarkan kolom
+        :param tahun: Tahun pengadaan
+        :param ascending: Ascending, descending jika diset False
+        :return: dictionary dari hasil pencarian paket (atau list jika data_only=True)
+        """
+        return self.get_paket('daruratlist', start, length, data_only, kategori, search_keyword, None, order, tahun,
+                              ascending, None)
 
     def detil_paket_tender(self, id_paket):
         """
@@ -791,3 +841,24 @@ class LpseDetilPemenangBerkontrakNonTenderParser(LpseDetilPemenangNonTenderParse
 class LpseDetilJadwalNonTenderParser(LpseDetilJadwalParser):
 
     detil_path = '/nontender/{}/jadwal'
+
+
+class LpseDetilPencatatan(LpseDetilPengumumanParser):
+    """
+    Base class untuk parse detail pencatatan
+    """
+    def __init__(self, tipe_pencatatan, *args, **kwargs):
+        """
+        Override constructor untuk set detil path sesuai dengan tipe pencatatan
+
+        :param tipe_pencatatan: tipe pencatatan (pencatatan_non_tender, pencatatan_swakelola,
+                                atau pencatatan_pengadaan_darurat)
+        """
+        if tipe_pencatatan == 'pencatatan_non_tender':
+            self.detil_path = '/pencatatan/pengumumannonspk?id={}'
+        if tipe_pencatatan == 'pencatatan_swakelola':
+            self.detil_path = '/swakelola/{}/pengumuman'
+        if tipe_pencatatan == 'pencatatan_pengadaan_darurat':
+            self.detil_path = '/darurat/pengumumandarurat?id={}'
+
+        super(LpseDetilPencatatan, self).__init__(*args, **kwargs)
